@@ -1,33 +1,57 @@
-# python3
-
 import sys
 import threading
-import numpy
 
+def compute_augstums(n, parents):
+    augstums = [0] * n
+    max_augstums = 0
+    
+    for i in range(n):
 
-def compute_height(n, parents):
-    # Write this function
-    max_height = 0
-    # Your code here
-    return max_height
+        node_weight = i
+        depth = 0
 
+        while not node_weight == -1:
+            if augstums[node_weight] == 0:
+                depth += 1
+                node_weight = parents[node_weight]
+            else:
+                depth += augstums[node_weight]
+                break
+            
+        max_augstums = max_augstums if max_augstums > depth else depth
+        
+        node_weight = i
+        while not node_weight == -1:
+            if augstums[node_weight] == 0:
+                augstums[node_weight] = depth
+                depth -= 1
+                node_weight = parents[node_weight]
+            else: 
+                break
+
+    
+    return max_augstums
 
 def main():
-    # implement input form keyboard and from files
-    
-    # let user input file name to use, don't allow file names with letter a
-    # account for github input inprecision
-    
-    # input number of elements
-    # input values in one variable, separate with space, split these values in an array
-    # call the function and output it's result
-    pass
+    type = input().strip()
 
-# In Python, the default limit on recursion depth is rather low,
-# so raise it here for this problem. Note that to take advantage
-# of bigger stack, we have to launch the computation in a new thread.
-sys.setrecursionlimit(10**7)  # max depth of recursion
-threading.stack_size(2**27)   # new thread will get stack of such size
+    if type == 'I':
+        n = int(input())
+        parents = list(map(int, input().split()))
+    elif type == 'F':
+        filename = input().strip()
+
+        with open('test/' + filename, 'r') as File:
+            n = int(File.readline())
+            parents_raw = File.readline().split()
+            parents = []
+            for i in range(len(parents_raw)):
+                parents.append(int(parents_raw[i]))
+        File.close()
+
+    augstums = compute_augstums(n, parents)
+    print(augstums)
+
+sys.setrecursionlimit(10**7)
+threading.stack_size(2**27)
 threading.Thread(target=main).start()
-main()
-# print(numpy.array([1,2,3]))
